@@ -1,9 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { ethers } from 'ethers';
+
 import { TransactionContext } from '../context/TransactionContext';
 import { creditABI, creditAddress, nftABI, nftAddress } from '../utils/constants';
-
-// Components
 
 
 function Attend() {
