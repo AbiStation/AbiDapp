@@ -2,8 +2,7 @@ import React, { createContext, useContext,useState, useEffect } from "react";
 import { ethers } from 'ethers';
 import { TransactionContext } from '../context/TransactionContext';
 import { creditABI, creditAddress, nftABI, nftAddress } from '../utils/constants';
-
-// Components
+import { useToast } from '../context/toast_context';
 
 
 function Vote() {
@@ -11,14 +10,15 @@ function Vote() {
     member_account: "",
     member_name: "",
   });
-
   const {
     currentAccount,
   } = useContext(TransactionContext);
-
+  
   const [eventAddress, setEventAddress] = useState('');
   const [showEnable, setShowEnable] = useState(false);
   const [voteDetail, setVoteDetail] = useState("");
+
+  const { showToast } = useToast()
 
   const handleChange = (e, name) => {
     setInput({ ...input, [e.target.name]: e.target.value });
@@ -73,8 +73,6 @@ function Vote() {
   async function Vote_Agree() {
     if (!input) return
 
-    // console.log(input.member_account);
-    // console.log(input.owner_account);
     try {
       if (typeof window.ethereum !== 'undefined') {
         const creditContract = createCreditContract();
@@ -88,7 +86,12 @@ function Vote() {
 
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      showToast({
+        title: 'Contract Error',
+        text: error.error.message,
+        type: 'danger',
+      })
     }
   };
 
@@ -110,7 +113,12 @@ function Vote() {
 
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      showToast({
+        title: 'Contract Error',
+        text: error.error.message,
+        type: 'danger',
+      })
     }
   };
 

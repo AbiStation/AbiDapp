@@ -1,13 +1,25 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, {useState, useEffect } from "react";
 import { ethers } from 'ethers';
+import detectEthereumProvider from '@metamask/detect-provider'
 
 import { creditABI, creditAddress, nftABI, nftAddress } from '../utils/constants';
 
 export const TransactionContext = React.createContext();
 
-const { ethereum } = window;
+// const { ethereum } = window;
+var ethereumProvider = null;
 
-const createCreditContract = () => {
+const getEthereum = async () => {
+  if (!ethereumProvider) {
+    ethereumProvider = await detectEthereumProvider()
+    window.ethereum = ethereumProvider; // for compatibility
+  }
+  return ethereumProvider;
+}
+
+
+const createCreditContract = async () => {
+  const ethereum = await getEthereum();
   const provider = new ethers.providers.Web3Provider(ethereum);
   const signer = provider.getSigner();
   const creditContract = new ethers.Contract(
@@ -19,7 +31,8 @@ const createCreditContract = () => {
   return creditContract;
 };
 
-const createNftContract = () => {
+const createNftContract = async () => {
+  const ethereum = await getEthereum();
   const provider = new ethers.providers.Web3Provider(ethereum);
   const signer = provider.getSigner();
   const NftContract = new ethers.Contract(
@@ -40,7 +53,7 @@ export const TransactionProvider = ({ children }) => {
   const [error, setError] = useState(null);
   useEffect(() => {
     if (error) 
-      toast.error(error)
+      console.log(error)
   }, [error])
 
   const [currentAccount, setCurrentAccount] = useState('');
@@ -50,6 +63,7 @@ export const TransactionProvider = ({ children }) => {
   };
 
   const checkIfWalletIsConnect = async () => {
+    const ethereum = await getEthereum();
     try {
       if (!ethereum) {
         setError("Please install MetaMask.");
@@ -60,8 +74,11 @@ export const TransactionProvider = ({ children }) => {
 
       if (accounts.length) {
         setCurrentAccount(accounts[0]);
-
+        if (ethereum.networkVersion !== '4') {
+          setError('Please connect to the Rinkeby test network.');
+        }
       }
+
     } catch (error) {
       console.log('No Wallet Connected Error:', error);
       setError('No Wallet Connected Error:', error);
@@ -70,9 +87,10 @@ export const TransactionProvider = ({ children }) => {
   };
 
   const connectWallet = async () => {
+    const ethereum = await getEthereum();
     setError(null)
-    if (window.ethereum) {
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
+    if (ethereum) {
+      const provider = new ethers.providers.Web3Provider(ethereum)
       try {
         const { chainId } = await provider.getNetwork()
         // if (chainId.toString() !== network.mumbai.chainId) {
@@ -85,6 +103,7 @@ export const TransactionProvider = ({ children }) => {
         setError(null)
       } catch (error) {
         setError("Error Connecting Wallet...")
+        console.error(error)
       }
     } else {
       setError("Metamask is not installed")
@@ -92,6 +111,7 @@ export const TransactionProvider = ({ children }) => {
   };
 
   const approve = async () => {
+    const ethereum = await getEthereum();
     try {
       if (ethereum) {
         const creditContract = createCreditContract();

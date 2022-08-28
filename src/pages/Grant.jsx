@@ -1,25 +1,22 @@
 import React, { createContext, useContext,useState, useEffect } from "react";
-import { ethers } from 'ethers';
-import { TransactionContext } from '../context/TransactionContext';
-import { creditABI, creditAddress, nftABI, nftAddress } from '../utils/constants';
 import axios from 'axios';  
+import { ethers } from 'ethers';
 
-// Components
-
+import { TransactionContext } from '../context/TransactionContext';
+import { useToast } from "../context/toast_context";
+import { creditABI, creditAddress, nftABI, nftAddress } from '../utils/constants';
 
 function Grant() {
   const [input, setInput] = useState({
     member_account: "",
     member_name: "",
   });
-
+  const [value, setValue] = useState('');
+  const [nextImage, setNextImage] = useState(''); 
+  const { showToast } = useToast();
   const {
     currentAccount,
   } = useContext(TransactionContext);
-
-  const [value, setValue] = useState('');
-
-  const [nextImage, setNextImage] = useState('');
 
   const handleChange = (e, name) => {
     setInput({ ...input, [e.target.name]: e.target.value });
@@ -74,7 +71,12 @@ function Grant() {
         });
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      showToast({
+        title: 'Contract Error',
+        text: error.error.message,
+        type: 'danger',
+      })
     }
   }
 
@@ -94,7 +96,12 @@ function Grant() {
 
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      showToast({
+        title: 'Contract Error',
+        text: error.error.message,
+        type: 'danger',
+      })
     }
   };
 

@@ -1,7 +1,6 @@
 import React, { createContext, useContext,useState, useEffect } from "react";
 import { ethers } from 'ethers';
-import { ToastContainer, toast } from 'react-toastify';
-// import "react-toastify/dist/ReactToastify.css"
+import { useToast } from "../context/toast_context";
 import { TransactionContext } from '../context/TransactionContext';
 import { creditABI, creditAddress, nftABI, nftAddress } from '../utils/constants';
 
@@ -18,6 +17,8 @@ function ApplyNft() {
   const {
     currentAccount,
   } = useContext(TransactionContext);
+
+  const { showToast } = useToast();
 
   const handleChange = (e, name) => {
     setInput({ ...input, [e.target.name]: e.target.value });
@@ -70,13 +71,14 @@ function ApplyNft() {
     }
 
     if(!input.member_name){
-      toast.error("member name can not be empty");
-      console.log("member name can not be empty");
+      showToast({
+        text: "member name can not be empty",
+        type: 'warning',
+        autohide: true,
+      })
       return;
     }
 
-    // console.log(input.member_account);
-    // console.log(input.owner_account);
     try {
       if (typeof window.ethereum !== 'undefined') {
         const nftContract = createNftContract();
@@ -91,7 +93,12 @@ function ApplyNft() {
         // checkMember();
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      showToast({
+        title: 'Contract Error',
+        text: error.error.message,
+        type: 'danger',
+      })
     }
   }
 

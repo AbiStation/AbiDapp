@@ -1,6 +1,8 @@
 import React, { createContext, useContext,useState, useEffect } from "react";
 import { ethers } from 'ethers';
+
 import { TransactionContext } from '../context/TransactionContext';
+import { useToast } from "../context/toast_context";
 import { creditABI, creditAddress, nftABI, nftAddress } from '../utils/constants';
 
 function Spawn() {
@@ -15,6 +17,8 @@ function Spawn() {
 
   const [showEnable, setShowEnable] = useState(false);
   const [spawnDetail, setSpawnDetail] = useState("");
+
+  const { showToast } = useToast();
 
   const handleChange = (e, name) => {
     setInput({ ...input, [e.target.name]: e.target.value });
@@ -69,8 +73,6 @@ function Spawn() {
   async function SpawnMember() {
     if (!input) return
 
-    // console.log(input.member_account);
-    // console.log(input.owner_account);
     try {
       if (typeof window.ethereum !== 'undefined') {
         const nftContract = createNftContract();
@@ -83,7 +85,12 @@ function Spawn() {
         })
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      showToast({
+        title: 'Contract Error',
+        text: error.error.message,
+        type: 'danger',
+      })
     }
   }
 

@@ -1,12 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { ethers } from 'ethers';
-import { TransactionContext } from '../context/TransactionContext';
-import { creditABI, creditAddress, nftABI, nftAddress } from '../utils/constants';
 
-// Components
+import { TransactionContext } from '../context/TransactionContext';
+import { useToast } from '../context/toast_context';
+import { creditABI, creditAddress, nftABI, nftAddress } from '../utils/constants';
 
 
 function Attend() {
+  const { showToast } = useToast()
+
   const [input, setInput] = useState({
     member_account: "",
     event_code: 0,
@@ -48,9 +50,9 @@ function Attend() {
   };
 
   async function AttendEvent() {
+
     if (!input) return
 
-    // console.log(input.member_account);
     console.log(input.event_code);
     try {
       if (typeof window.ethereum !== 'undefined') {
@@ -62,10 +64,14 @@ function Attend() {
           setAttendDetail(String(attendnum));
           setShowEnable(true);
         })
-
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      showToast({
+        title: 'Contract Error',
+        text: error.error.message,
+        type: 'danger',
+      })
     }
   };
 
