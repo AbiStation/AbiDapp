@@ -53,8 +53,7 @@ export const TransactionProvider = ({ children }) => {
   const [error, setError] = useState(null);
   useEffect(() => {
     if (error) 
-      // toast.error(error)
-      alert(error)
+      console.log(error)
   }, [error])
 
   const [currentAccount, setCurrentAccount] = useState('');
@@ -92,7 +91,6 @@ export const TransactionProvider = ({ children }) => {
     setError(null)
     if (ethereum) {
       const provider = new ethers.providers.Web3Provider(ethereum)
-      // const provider = ethereum;
       try {
         const { chainId } = await provider.getNetwork()
         // if (chainId.toString() !== network.mumbai.chainId) {

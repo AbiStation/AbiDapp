@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom"
 import { Nav, Navbar, Offcanvas } from 'react-bootstrap';
 import { UserCircleIcon } from "@heroicons/react/outline"
@@ -6,7 +6,9 @@ import { UserIcon } from "@heroicons/react/solid"
 import clsx from "clsx"
 
 import { TransactionContext } from '../context/TransactionContext';
+import { useToast } from '../context/toast_context';
 
+import './navbar.css';
 
 const navItems = [
   {
@@ -55,6 +57,7 @@ function Button({ text, bg, padding }) {
 
 
 function MyNavbar() {
+
   const {
     connectWallet,
     currentAccount,
@@ -64,6 +67,17 @@ function MyNavbar() {
   // const handleWalletConnect = () => {
   //   console.log("Hello Approve")
   // };
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    if (error) {
+      showToast({
+        title: 'Error',
+        text: error, 
+        type: 'warning'
+      })
+    }
+  } , [error]);
 
   return (
     <div className="fixed left-0 right-0 top-0 h-16 shadow-md border-b-2 border-gray-100 bg-gray-900">
@@ -72,7 +86,7 @@ function MyNavbar() {
           Abi DAO
         </h1>
         <div>
-          <div className="flex items-center space-x-10 text-sm">
+          <div className="flex items-center space-x-5 text-sm">
 
             <Navbar collapseOnSelect expand="lg" variant="dark">
               <Navbar.Toggle aria-controls="responsive-navbar-nav" />
@@ -81,13 +95,19 @@ function MyNavbar() {
                 id={`offcanvasNavbar-expand-lg`}
                 aria-labelledby={`offcanvasNavbarLabel-expand-lg`}
                 placement="end"
-                variant="dark"
+                // variant='dark'
+                style={{maxWidth: '60%'}}
               >
               <Offcanvas.Header closeButton/>
                 <Offcanvas.Body>
-                  <Nav className="">
+                  <Nav>
                     {navItems.map((navItem) => (
-                      <NavLink to={navItem.to} key={navItem.text} className="text-gray-400 hover:text-gray-100 mr-10 nav-link">{navItem.text}</NavLink>
+                      // TODO: auto hide when clicked
+                      <NavLink 
+                        to={navItem.to} 
+                        key={navItem.text} 
+                        className="nav-link text-gray-400 hover:text-gray-100 mr-10"
+                      >{navItem.text}</NavLink>
                     ))}
                   </Nav>
                 </Offcanvas.Body>

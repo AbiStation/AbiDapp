@@ -75,9 +75,6 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
-a {
-  text-decoration: none!important;
-}
 
 @tailwind base;
 @tailwind components;
